@@ -1,0 +1,28 @@
+<!doctype html>
+<title>Current Information</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<div><h1>Current status : <img id='img_current' src='/static/{% if info.current %}green.gif{% else %}red.gif{% endif %}'></h1></div>
+<div>
+  <form action="{{url_for('send_alarm')}}" method=post>
+    警訊內容：<input type=text size=30 name=alarm>
+    <span id="status">{% if info.status %}{{ info.status }}{% endif %}</span><br>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <input type=submit value="送出">
+  </form>
+</div>
+<script type=text/javascript>
+  $(function() {
+		  setInterval(function(){
+		  	$.get("{{url_for('update_current')}}", function(data) {
+		  		var $loader = $(document.createElement('img'));
+          $loader.one('load', function() {
+              $('#img_current').attr('src', $loader.attr('src'));
+          });
+          $loader.attr('src', '/static/'.concat((data.current)?'green.gif':'red.gif'));
+          if($loader.complete) {
+              $loader.trigger('load');
+          }
+		  	});
+		  }, 1000);
+  });
+</script>
